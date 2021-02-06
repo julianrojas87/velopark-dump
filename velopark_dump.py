@@ -14,11 +14,12 @@ def query_graph(graph):
        PREFIX mv: <http://schema.mobivoc.org/>
        PREFIX gr: <http://purl.org/goodrelations/v1#>
 
-       SELECT ?parking ?name ?owner ?address ?postCode ?email ?telephone ?section ?type ?capacity ?latitude ?longitude ?shape
+       SELECT ?parking ?name ?owner ?address ?postCode ?email ?telephone ?section ?type ?capacity ?numberOfLevels ?covered ?website ?publicAccess ?temporarilyClosed ?intendedAudience ?osm ?latitude ?longitude ?shape ?freeOfCharge ?price
        WHERE {
         ?parking schema:name ?name ;
             mv:ownedBy [ gr:legalName ?owner ] ;
-            schema:address [ schema:streetAddress ?address ] .
+            schema:address [ schema:streetAddress ?address ] ; 
+            schema:hasMap [ schema:url ?osm ] .
         OPTIONAL { ?parking schema:address [ schema:postalCode ?postCode ] }
         OPTIONAL {
             ?parking schema:contactPoint [
@@ -26,6 +27,8 @@ def query_graph(graph):
                     schema:telephone ?telephone
             ] .
         }
+        OPTIONAL { ?parking vp:temporarilyClosed ?temporarilyClosed }
+        OPTIONAL { ?parking schema:interactionService [ schema:url ?website ] }
         
         GRAPH ?g {
             ?section a ?type ;
@@ -36,9 +39,31 @@ def query_graph(graph):
                     schema:longitude ?longitude
                 ] .
                 OPTIONAL {
+                    ?section schema:publicAccess ?publicAccess
+                }
+                OPTIONAL {
+                    ?section mv:numberOfLevels ?numberOfLevels
+                }
+                OPTIONAL {
+                    ?section vp:covered ?covered
+                }
+                OPTIONAL {
+                    ?section vp:intendedAudience ?intendedAudience
+                }
+                OPTIONAL {
                     ?x schema:geo [
                         a schema:GeoShape ;
                         schema:polygon ?shape
+                    ]
+                }
+                OPTIONAL {
+                    ?section schema:priceSpecification [
+                        mv:freeOfCharge ?freeOfCharge
+                    ]
+                }
+                OPTIONAL {
+                    ?section schema:priceSpecification [
+                        schema:price ?price
                     ]
                 }        
         }
@@ -61,6 +86,7 @@ data_list = []
 
 # get list of parkings
 parking_uris = get_as_list("https://velopark.ilabt.imec.be/rich-snippets-generator/api/" + region)
+#parking_uris = ["https://velopark.ilabt.imec.be/data/Stad-Brugge_Markt-"]
 
 for p in parking_uris:
     print("--------------------------------------------")
@@ -68,7 +94,7 @@ for p in parking_uris:
     print("getting data of parking: " , p_uri.geturl())
     # create a Graph
     g = rdflib.ConjunctiveGraph()
-    # parse in an RDF file hosted on the Web
+    # parse an RDF file hosted on the Web
     g.default_context.parse(p_uri.scheme + "://" + p_uri.netloc + "/" + urllib.parse.quote(p_uri.path))
     # extract data from graph with a SPARQL query
     data = list(query_graph(g))
@@ -83,6 +109,8 @@ for p in parking_uris:
 with open("velopark_" + region + ".csv", "w", newline="") as file:
     writer = csv.writer(file)
     writer.writerow(["parking", "name", "owner", "address", "postCode", "email",
-                     "telephone", "type", "capacity", "latitude", "longitude", "shape"])
+                     "telephone", "type", "capacity", "numberOfLevels", "covered", "website", "publicAccess", 
+                     "temporarilyClosed", "intendedAudience", "OpenStreetMap", "latitude", 
+                     "longitude", "shape", "freeOfCharge", "price"])
     for row in data_list:
         writer.writerow(row)
