@@ -40,8 +40,7 @@ def query_graph(graph):
                         a schema:GeoShape ;
                         schema:polygon ?shape
                     ]
-                }
-                
+                }        
         }
         
        }""")
