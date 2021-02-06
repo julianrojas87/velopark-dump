@@ -1,5 +1,5 @@
 # velopark-dump
-Python script to download Velopark's parkings of a certain region (NIS code) into a CSV file.
+Python script to download Velopark's parkings of a certain region ([NIS code](https://en.wikipedia.org/wiki/NIS_code)) into a CSV file.
 
 ## Install it
 
