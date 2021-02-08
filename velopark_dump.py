@@ -32,12 +32,14 @@ def query_graph(graph):
         
         GRAPH ?g {
             ?section a ?type ;
-                mv:totalCapacity ?capacity ;
                 schema:geo [
                     a schema:GeoCoordinates ;
                     schema:latitude ?latitude ;
                     schema:longitude ?longitude
                 ] .
+                OPTIONAL {
+                    ?section mv:totalCapacity ?capacity
+                }
                 OPTIONAL {
                     ?section schema:publicAccess ?publicAccess
                 }
@@ -76,8 +78,12 @@ def get_total_capacity(data):
     for row in data:
         if not list(row)[7] in sections:
             sections.add(list(row)[7])
-            capacity += int(list(row)[9])
-    return capacity
+            if(list(row)[9] is not None):
+                capacity += int(list(row)[9])
+    if capacity > 0:
+        return capacity
+    else:
+        return ""
 
 ################ Main script logic #################
 args = ast.literal_eval(str(sys.argv))
@@ -86,7 +92,7 @@ data_list = []
 
 # get list of parkings
 parking_uris = get_as_list("https://velopark.ilabt.imec.be/rich-snippets-generator/api/" + region)
-#parking_uris = ["https://velopark.ilabt.imec.be/data/Stad-Brugge_Markt-"]
+#parking_uris = ["https://velopark.ilabt.imec.be/data/NMBS_275"]
 
 for p in parking_uris:
     print("--------------------------------------------")
