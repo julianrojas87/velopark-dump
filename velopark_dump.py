@@ -125,6 +125,7 @@ def query_opening(graph):
     )
 
 
+weekdays = {name:index for index,name in enumerate(["Mon","Tue","Wed","Thu","Fri","Sat","Sun"])}
 #encoding the opening hours
 #format:   section1|section2...
 # section = weekday1;weekday2...
@@ -172,7 +173,7 @@ def get_encoded_hours(hours):
                             lambda hour: f"{hour[0]}-{hour[1]}",
                             section[day])
                     )),
-                    section.keys())
+                    sorted(section.keys(),key=weekdays.get))
             ),
             coded_hours.values())
     )
@@ -203,7 +204,7 @@ data_list = []
 #test_encode()
 
 # get list of parkings
-parking_uris = get_as_list("https://velopark.ilabt.imec.be/rich-snippets-generator/api/" + region)
+parking_uris = get_as_list("https://data.velopark.be/rich-snippets-generator/api/" + region)
 #parking_uris = testURLS(45,94,785,123,689,741,201,656)
 
 for p in parking_uris:
@@ -213,7 +214,7 @@ for p in parking_uris:
     # create a Graph
     g = rdflib.ConjunctiveGraph()
     # parse an RDF file hosted on the Web
-    g.default_context.parse(p_uri.scheme + "://" + p_uri.netloc + "/" + urllib.parse.quote(p_uri.path))
+    g.default_context.parse(p_uri.scheme + "://" + p_uri.netloc + "/" + urllib.parse.quote(p_uri.path), format="json-ld")
     # extract data from graph with a SPARQL query
     data = list(query_graph(g))
     # calculate capacity considering parkings with multiple sections
