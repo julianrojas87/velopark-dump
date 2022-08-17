@@ -2,7 +2,7 @@
 Python script to download Velopark's parkings of a certain region ([NIS code](https://en.wikipedia.org/wiki/NIS_code)) into a CSV file.
 
 ## ⚠️ Disclaimer
-This script creates an export of the parking data with only a subset of the properties available in the original data source, [published by Velopark](https://velopark.ilabt.imec.be/data/catalog) on the Web. This is due to having some property values as lists of objects, which in turn have multiple properties, as in the case for example of [`schema:openingHoursSpecification`](https://schema.org/openingHoursSpecification) or [`vp:allows`](http://velopark.ilabt.imec.be/openvelopark/vocabulary#https://velopark.ilabt.imec.be/openvelopark/vocabulary#allows). Such property value lists cannot be easily included in a simple CSV row and would need to be somehow encoded. Therefore they are not included in this export.       
+This script creates an export of the parking data with only a subset of the properties available in the original data source, [published by Velopark](https://velopark.ilabt.imec.be/data/catalog) on the Web. This is due to having some property values as lists of objects, which in turn have multiple properties, as in the case for example of [`vp:allows`](http://velopark.ilabt.imec.be/openvelopark/vocabulary#https://velopark.ilabt.imec.be/openvelopark/vocabulary#allows). Such property value lists cannot be easily included in a simple CSV row and would need to be somehow encoded. Therefore they are not included in this export. As requested, the [`schema:openingHoursSpecification`](https://schema.org/openingHoursSpecification) has been included.
 
 ## Install it
 
